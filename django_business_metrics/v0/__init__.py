@@ -1,6 +1,8 @@
-from django_business_metrics.collector import (
-    BusinessMetricsCollector,
-    BUSINESS_METRICS_COLLECTOR,
-    business_metric,
+from django_business_metrics.metrics_manager import (
+    BusinessMetricsManager,
 )
-from django_business_metrics.views import business_metrics_view
+
+from django_business_metrics.metrics import (
+    users,
+    active_users
+)

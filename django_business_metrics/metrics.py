@@ -1,4 +1,12 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
-def user_count_metric() -> int:
-    return float(User.objects.count())
+def users() -> int:
+    """Total user count"""
+    User = get_user_model()
+    return User.objects.count()
+
+
+def active_users() -> int:
+    """Active user count"""
+    User = get_user_model()
+    return User.objects.filter(is_active=True).count()

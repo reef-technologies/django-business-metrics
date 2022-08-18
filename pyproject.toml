@@ -1,16 +1,15 @@
-[tool.poetry]
-name = "django-business-metrics"
-version = "0.1.0"
-description = ""
-authors = ["Vykintas Baltrušaitis <vykintas.baltrusaitis@reef.pl>"]
-
-[tool.poetry.dependencies]
-python = "^3.8"
-Django = "^4.1"
-django-prometheus = "^2.2.0"
-
-[tool.poetry.dev-dependencies]
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django_business_metrics"
+version = "0.1.0"
+description = "Django Prometheus business metrics"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "BSD 3-Clause License"}
+dependencies = [
+    "Django",
+    "prometheus_client",
+]
