@@ -1,15 +1,25 @@
-[build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "django_business_metrics"
-version = "0.1.0"
+[tool.poetry]
+name = "django-business-metrics"
+version = "0.1.0-alpha2"
 description = "Django Prometheus business metrics"
+authors = ["Reef Technologies <vykintas.baltrusaitis@reef.pl>"]
+license = "MIT"
 readme = "README.md"
-requires-python = ">=3.9"
-license = {text = "BSD 3-Clause License"}
-dependencies = [
-    "Django",
-    "prometheus_client",
-]
+
+[tool.poetry.dependencies]
+python = ">=3.8, <3.11"
+Django = ">=3, <4"
+prometheus-client = "^0.14.1"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6.0"
+isort = "^5.10.1"
+mypy = "^0.971"
+django-stubs = "^1.12.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"

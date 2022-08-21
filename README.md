@@ -1,40 +1,42 @@
 # Django Prometheus business metrics
 
-# Usage
+This Django app provides a Prometheus metrics endpoint serving so-called business metrics. These are metrics that are calculated when Prometheus hits the metrics endpoint.
 
-1. Register a business metrics endpoint in your Django project's `urls.py`:
+## Usage
+
+1. Create a `BusinessMetricsManager` object and register some metrics:
 
     ```
-    from django_business_metrics.v0 import business_metrics_view
+    # project/business_metrics.py
+
+    from django_business_metrics.v0 import BusinessMetricsManager, users
+
+    metrics_manager = BusinessMetricsManager()
+
+    # Add a pre-defined metric
+    metrics_manager.add(users)
+
+    # Add some custom metrics
+    @metrics_manager.metric()
+    def my_metric():
+        return 10
+    ```
+
+2. Register a Prometheus endpoint:
+
+
+    ```
+    # project/urls.py
+
+    ```
+    from .business_metrics import metrics_manager
 
     ...
     urlpatterns = [
         ...
-        path(r'business_metrics/?', business_metrics_view),
+        path('business-metrics', metrics_manager.view),
         ...
     ]
     ```
 
-2. Register some custom metrics:
-
-    ```
-    from django.contrib.auth.models import User
-    from django_business_metrics.v0 import business_metrics
-
-    @business_metrics(name="user_count")
-    def user_count():
-        return User.objects.count()
-    ```
-
-    And/or register some of the pre-defined metrics:
-
-    ```
-    from django_business_metrics.v0 import BUSINESS_METRICS_COLLECTOR, user_count_metric
-
-    BUSINESS_METRICS_COLLECTOR.register_metric(
-        name="user_count",
-        callable=user_count_metric
-    )
-    ```
-
-3. Setup your Prometheus agent to scrape metrics from `/business_metrics` endpoint.
+3. Setup your Prometheus agent to scrape metrics from `/business-metrics` endpoint.
