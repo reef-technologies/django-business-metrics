@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-business-metrics"
-version = "0.1.0-alpha3"
+version = "0.1.0-alpha4"
 description = "Django Prometheus business metrics"
 authors = ["Reef Technologies <vykintas.baltrusaitis@reef.pl>"]
 license = "MIT"
@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.8, <3.11"
 Django = ">=3, <4"
-prometheus-client = "^0.14.1"
+prometheus-client = ">=0.13.0 <0.15"
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
