@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-business-metrics"
-version = "0.1.0-alpha2"
+version = "0.1.0-alpha3"
 description = "Django Prometheus business metrics"
 authors = ["Reef Technologies <vykintas.baltrusaitis@reef.pl>"]
 license = "MIT"

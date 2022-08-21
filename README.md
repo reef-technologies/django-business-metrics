@@ -28,7 +28,7 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
     ```
     # project/urls.py
 
-    ```
+    ...
     from .business_metrics import metrics_manager
 
     ...
