@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Callable, Dict, Iterable
+from typing import Callable, Dict, Iterable, Optional
 
 import prometheus_client
 from django.http import HttpRequest, HttpResponse
@@ -17,11 +17,13 @@ class _BusinessMetric:
 
 class _BusinessMetricsCollector(CollectorRegistry):
     _metrics: Dict[str, _BusinessMetric]
-    concurrent_collections: int
+    _concurrent_collections: int
+    _timeout: float
 
-    def __init__(self, concurrent_collections=5):
+    def __init__(self, concurrent_collections: int, timeout: float):
         self._metrics = {}
-        self.concurrent_collections = concurrent_collections
+        self._concurrent_collections = concurrent_collections
+        self._timeout = timeout
 
     @staticmethod
     def _map_metric(metric: _BusinessMetric) -> GaugeMetricFamily:
@@ -38,35 +40,57 @@ class _BusinessMetricsCollector(CollectorRegistry):
         return self
 
     def collect(self) -> Iterable[GaugeMetricFamily]:
-        with ThreadPoolExecutor(max_workers=self.concurrent_collections) as pool:
-            return pool.map(self._map_metric, self._metrics.values())
+        with ThreadPoolExecutor(max_workers=self._concurrent_collections) as pool:
+            return pool.map(
+                self._map_metric, self._metrics.values(), timeout=self._timeout
+            )
 
 
 class BusinessMetricsManager:
+    """BusinessMetricsManager collects and formats business metrics."""
+
     _collector: _BusinessMetricsCollector
 
-    def __init__(self, concurrent_collections: int = 5):
-        self._collector = _BusinessMetricsCollector(concurrent_collections)
+    def __init__(self, concurrent_collections: int = 5, timeout=10):
+        """
+        concurrent_collections - how many metrics should be collected concurrently at a time.
+        timeout - timeout of the metrics collection.
+        """
+        self._collector = _BusinessMetricsCollector(concurrent_collections, timeout)
 
-    def add(self, func: Callable[[], float], name=None, documentation=""):
+    def add(self, callable: Callable[[], float], name=None, documentation=""):
         """Add a metric."""
         metric = _BusinessMetric(
-            name=name or func.__name__, documentation=documentation, callable=func
+            name=name or callable.__name__,
+            documentation=documentation,
+            callable=callable,
         )
         self._collector.add(metric)
         return self
 
-    def metric(self, name=None, documentation=""):
-        """A decorator that marks a function as a metric."""
+    def metric(self, name: Optional[str] = None, documentation: str = ""):
+        """A decorator that marks a function as a metric.
 
-        def metric_decorator(func: Callable[[], float]):
-            self.add(func, name or func.__name__, documentation=documentation)
-            return func
+        Example use:
+        ```
+        @metric_manager.metric(name='my_metric_name', documentation='My documentation')
+        def my_metric():
+            return 1
+        ```
+
+        Parameters:
+        name - name or the metric. If not provided, function name will be used.
+        documentation - description of the metric. Optional.
+        """
+
+        def metric_decorator(callable: Callable[[], float]):
+            self.add(callable, name or callable.__name__, documentation=documentation)
+            return callable
 
         return metric_decorator
 
     def view(self, _: HttpRequest) -> HttpResponse:
-        """Django view that returns a Prometheus-compatable metrics page."""
+        """Django view that returns a Prometheus-compatable metrics scrape page."""
         return HttpResponse(
             prometheus_client.generate_latest(self._collector),
             content_type=prometheus_client.CONTENT_TYPE_LATEST,

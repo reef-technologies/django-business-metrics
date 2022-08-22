@@ -17,7 +17,7 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
     metrics_manager.add(users)
 
     # Add some custom metrics
-    @metrics_manager.metric()
+    @metrics_manager.metric(name='name', documentation='documentation')
     def my_metric():
         return 10
     ```
