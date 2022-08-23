@@ -9,17 +9,25 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
     ```
     # project/business_metrics.py
 
-    from django_business_metrics.v0 import BusinessMetricsManager, users
+    from django_business_metrics.v0 import BusinessMetricsManager, users, HistogramOutput
 
     metrics_manager = BusinessMetricsManager()
 
     # Add a pre-defined metric
     metrics_manager.add(users)
 
-    # Add some custom metrics
-    @metrics_manager.metric(name='name', documentation='documentation')
-    def my_metric():
+    # Add a custom gauge metric
+    @metrics_manager.metric(name='my_gauge', documentation='documentation')
+    def my_gauge():
         return 10
+
+    # Add a custom histogram metric
+    @metrics_manager.metric(name='my_histogram')
+    def my_histogram():
+        return HistogramOutput(
+            sum_value=1000,
+            buckets={'0.01': 1, '0.1': 10, '1': 10, '+Inf': 100}
+        )
     ```
 
 2. Register a Prometheus endpoint:
