@@ -15,15 +15,17 @@ class HistogramOutput:
 
     buckets: Dict[str, int]
     """A dict of `upper_bound: count` pairs where `count` is a number
-    of observations that are less than or equal to `upper_bound`.
-    
+    of _all_ observations that are less than or equal to `upper_bound`.
+    For example, observation with value 0.1 should be counted in all
+    buckets with label higher or equal to 0.1: '0.1', '0.2', etc.
+
     There must be at least two buckets.
     There must be a special bucket with key '+Inf' which contains the
     count of all observations.
     All bucket keys must be string representations of float numbers.
-    
+
     Example:
-    ```{'1e-2': 10, '1e-1': 100, '1': 1000, '+Inf': 10000}```
+    ```{'0.1': 1, '1': 10, '+Inf': 100}```
     """
 
 
