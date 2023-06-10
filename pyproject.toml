@@ -11,18 +11,19 @@ python = ">=3.9"
 Django = ">=3"
 prometheus-client = ">=0.13.0"
 
-[tool.poetry.group.dev.dependencies]
-black = ">=22.6.0"
-django-stubs = ">=1.12.0"
-mypy = ">=0.971"
-nox = ">=2023"
-pytest = ">=6"
-pytest-django = "*"
-ruff = ">=0.0.272"
+# extras
+black = {version = ">=22.6.0", optional = true}
+django-stubs = {version = ">=1.12.0", optional = true}
+mypy = {version = ">=0.971", optional = true}
+nox = {version = ">=2023", optional = true}
+pytest = {version = ">=6", optional = true}
+pytest-django = {version = "*", optional = true}
+ruff = {version = ">=0.0.272", optional = true}
 
-[tool.poetry.group.test.dependencies]
-pytest-django = "*"
-pytest = ">=6"
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.extras]
+dev = ["black", "django-stubs", "mypy", "nox", "pytest", "pytest-django", "ruff"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

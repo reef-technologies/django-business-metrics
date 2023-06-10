@@ -56,5 +56,5 @@ def lint(session):
 @nox.session(python=PYTHON_VERSIONS)
 @nox.parametrize("django", DJANGO_VERSIONS)
 def test(session, django: str):
-    session.run("pip", "install", f"django~={django}.0", "-e", ".[test]")
+    session.run("pip", "install", f"django~={django}.0", "-e", ".[dev]")
     session.run("pytest", "-vv")
