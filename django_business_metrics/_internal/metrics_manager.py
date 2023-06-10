@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Callable, Dict, Iterable, Optional
+from typing import Callable
 
 import prometheus_client
 from django.http import HttpRequest, HttpResponse
@@ -16,7 +19,7 @@ class _BusinessMetric:
 
 
 class _BusinessMetricsCollector(CollectorRegistry):
-    _metrics: Dict[str, _BusinessMetric]
+    _metrics: dict[str, _BusinessMetric]
     _concurrent_collections: int
     _timeout: float
 
@@ -68,7 +71,7 @@ class BusinessMetricsManager:
         self._collector.add(metric)
         return self
 
-    def metric(self, name: Optional[str] = None, documentation: str = ""):
+    def metric(self, name: str | None = None, documentation: str = ""):
         """A decorator that marks a function as a metric.
 
         Example use:
