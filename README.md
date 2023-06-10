@@ -44,3 +44,16 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
     ```
 
 3. Setup your Prometheus agent to scrape metrics from `/business-metrics` endpoint.
+
+
+## Development
+
+```
+poetry install
+```
+
+Before committing make sure to run:
+
+```
+nox -s format test
+```
