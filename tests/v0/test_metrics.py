@@ -1,4 +1,5 @@
 import pytest
+
 from django_business_metrics.v0 import active_users, users
 
 
