@@ -4,7 +4,7 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
 
 ## Usage
 
-> This project uses this project uses [ApiVer](https://www.youtube.com/watch?v=FgcoAKchPjk)
+> This project uses [ApiVer](https://www.youtube.com/watch?v=FgcoAKchPjk).
 > Always import from `django_business_metrics.v0` namespace and not from `django_business_metrics`.
 
 
