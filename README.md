@@ -4,6 +4,10 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
 
 ## Usage
 
+> This project uses [ApiVer](https://www.youtube.com/watch?v=FgcoAKchPjk).
+> Always import from `django_business_metrics.v0` namespace and not from `django_business_metrics`.
+
+
 1. Create a `BusinessMetricsManager` object and register some metrics:
 
     ```
@@ -40,3 +44,16 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
     ```
 
 3. Setup your Prometheus agent to scrape metrics from `/business-metrics` endpoint.
+
+
+## Development
+
+```
+poetry install
+```
+
+Before committing make sure to run:
+
+```
+nox -s format test
+```

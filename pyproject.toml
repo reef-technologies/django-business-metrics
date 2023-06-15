@@ -1,25 +1,49 @@
 [tool.poetry]
 name = "django-business-metrics"
-version = "0.1.0"
+version = "1.0.0"
 description = "Django Prometheus business metrics"
 authors = ["Reef Technologies <vykintas.baltrusaitis@reef.pl>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8, <3.11"
-Django = ">=3, <4"
-prometheus-client = ">=0.13.0 <0.15"
+python = ">=3.9"
+Django = ">=3"
+prometheus-client = ">=0.13.0"
+
+# extras
+black = {version = ">=22.6.0", optional = true}
+django-stubs = {version = ">=1.12.0", optional = true}
+mypy = {version = ">=0.971", optional = true}
+nox = {version = ">=2023", optional = true}
+pytest = {version = ">=6", optional = true}
+pytest-django = {version = "*", optional = true}
+ruff = {version = ">=0.0.272", optional = true}
 
 [tool.poetry.dev-dependencies]
-black = "^22.6.0"
-isort = "^5.10.1"
-mypy = "^0.971"
-django-stubs = "^1.12.0"
+
+[tool.poetry.extras]
+dev = ["black", "django-stubs", "mypy", "nox", "pytest", "pytest-django", "ruff"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.isort]
-profile = "black"
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE="tests.settings"
+
+[tool.ruff]
+target-version = "py39"
+# TODO add D
+select = ["E", "F", "I", "UP"]
+# TODO: remove E501 once docstrings are formatted
+ignore = [
+    "D100", "D105", "D107", "D200", "D202", "D203", "D205", "D212", "D400", "D401", "D415",
+    "D101", "D102","D103", "D104", # TODO remove once we have docstring for all public methods
+    "E501", # TODO: remove E501 once docstrings are formatted
+]
+line-length = 100
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**" = ["D", "F403", "F405"]
