@@ -49,7 +49,7 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
 ## Development
 
 ```
-poetry install
+pdm install --dev
 ```
 
 Before committing make sure to run:
