@@ -41,7 +41,6 @@ def run_readable(session, mode="fmt"):
 
 @nox.session(name="format", python=PYTHON_DEFAULT_VERSION)
 def format_(session):
-    session.run_always("pip", "install", "pdm")
     session.run_always("pdm", "install", "--dev")
     session.run("black", ".")
     session.run("ruff", "check", "--fix", ".")
@@ -50,7 +49,6 @@ def format_(session):
 
 @nox.session(python=PYTHON_DEFAULT_VERSION)
 def lint(session):
-    session.run_always("pip", "install", "pdm")
     session.run_always("pdm", "install", "--dev")
     session.run("black", "--diff", ".")
     session.run("ruff", "check", "--diff", ".")
@@ -60,7 +58,6 @@ def lint(session):
 @nox.session(python=PYTHON_VERSIONS)
 @nox.parametrize("django", DJANGO_VERSIONS)
 def test(session, django: str):
-    session.run_always("pip", "install", "pdm")
     session.run_always("pdm", "install", "--dev")
     session.run_always("pip", "install", f"django~={django}.0")
     session.run("pytest", "-vv")

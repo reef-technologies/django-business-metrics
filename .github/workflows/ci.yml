@@ -27,8 +27,8 @@ jobs:
           path: ~/.cache/pdm
           key: ${{ env.PYTHON_DEFAULT_VERSION }}-pdm-${{ hashFiles('pdm.lock') }}
           restore-keys: ${{ env.PYTHON_DEFAULT_VERSION }}-pdm-
-      - name: Install nox
-        run: python -m pip install --upgrade nox
+      - name: Install runners
+        run: python -m pip install --upgrade nox pdm
       - name: Run linters
         run: nox -vs lint
 
@@ -54,7 +54,7 @@ jobs:
           path: ~/.cache/pdm
           key: ${{ matrix.python-version }}-pdm-${{ hashFiles('pdm.lock') }}
           restore-keys: ${{ matrix.python-version }}-pdm-
-      - name: Install nox
-        run: python -m pip install --upgrade nox
+      - name: Install runners
+        run: python -m pip install --upgrade nox pdm
       - name: Run unit tests
         run: nox -vs test
