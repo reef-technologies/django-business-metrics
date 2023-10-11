@@ -48,6 +48,14 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
 
 ## Development
 
+### Base requirements
+
+- docker, docker-compose
+- nox
+- pdm
+
+### Handy commands for development
+
 ```
 pdm install --dev
 ```
