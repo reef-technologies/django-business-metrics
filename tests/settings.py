@@ -1,6 +1,7 @@
 """
 Django settings used in tests.
 """
+
 DEBUG = True
 SECRET_KEY = "DUMMY"
 

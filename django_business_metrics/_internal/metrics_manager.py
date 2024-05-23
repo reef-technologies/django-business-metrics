@@ -44,9 +44,7 @@ class _BusinessMetricsCollector(CollectorRegistry):
 
     def collect(self) -> Iterable[GaugeMetricFamily]:
         with ThreadPoolExecutor(max_workers=self._concurrent_collections) as pool:
-            return pool.map(
-                self._map_metric, self._metrics.values(), timeout=self._timeout
-            )
+            return pool.map(self._map_metric, self._metrics.values(), timeout=self._timeout)
 
 
 class BusinessMetricsManager:
@@ -71,19 +69,18 @@ class BusinessMetricsManager:
         self._collector.add(metric)
         return self
 
-    def metric(self, name: str | None = None, documentation: str = ""):
-        """A decorator that marks a function as a metric.
+    def metric(self, name: str | None = None, documentation: str = "") -> Callable:
+        """
+        A decorator that marks a function as a metric.
 
-        Example use:
-        ```
-        @metric_manager.metric(name='my_metric_name', documentation='My documentation')
-        def my_metric():
-            return 1
-        ```
+        Example use::
 
-        Parameters:
-        name - name or the metric. If not provided, function name will be used.
-        documentation - description of the metric. Optional.
+           @metric_manager.metric(name='my_metric_name', documentation='My documentation')
+           def my_metric():
+               return 1
+
+        :param name: name of the metric. If not provided, the function name will be used.
+        :param documentation: description of the metric.
         """
 
         def metric_decorator(callable: Callable[[], float]):
