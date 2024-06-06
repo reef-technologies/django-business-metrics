@@ -48,20 +48,23 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
 
 ## Development
 
-### Base requirements
+Pre-requisites:
+- [pdm](https://pdm.fming.dev/)
+- [nox](https://nox.thea.codes/en/stable/)
+- [docker](https://www.docker.com/) and [docker composep plugin](https://docs.docker.com/compose/)
 
-- docker, docker-compose
-- nox
-- pdm
 
-### Handy commands for development
+Ideally, you should run `nox -s format lint` before every commit to ensure that the code is properly formatted and linted.
+Before submitting a PR, make sure that tests pass as well, you can do so using:
+```
+nox -s format lint test
+```
 
+If you wish to install dependencies into `.venv` so your IDE can pick them up, you can do so using:
 ```
 pdm install --dev
 ```
 
-Before committing make sure to run:
+### Release process
 
-```
-nox -s format test
-```
+Run `nox -s make_release -- X.Y.Z` where `X.Y.Z` is the version you're releasing and follow the printed instructions.

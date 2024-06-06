@@ -18,4 +18,4 @@ DATABASES = {
 }
 
 ROOT_URLCONF = __name__
-urlpatterns = []
+urlpatterns = []  # type: ignore
