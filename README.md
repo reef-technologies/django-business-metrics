@@ -54,10 +54,10 @@ Pre-requisites:
 - [docker](https://www.docker.com/) and [docker composep plugin](https://docs.docker.com/compose/)
 
 
-Ideally, you should run `nox -s format lint` before every commit to ensure that the code is properly formatted and linted.
+Ideally, you should run `nox -t format lint` before every commit to ensure that the code is properly formatted and linted.
 Before submitting a PR, make sure that tests pass as well, you can do so using:
 ```
-nox -s format lint test
+nox -t check # equivalent to `nox -t format lint test`
 ```
 
 If you wish to install dependencies into `.venv` so your IDE can pick them up, you can do so using:

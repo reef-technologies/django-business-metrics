@@ -33,11 +33,15 @@ if CI:
     PYTHON_VERSIONS = [sys.executable]
 
 
-def install(session: nox.Session, *args):
-    groups = []
+def install(session: nox.Session, *args, no_self=False, no_default=False):
+    other_args = []
+    if no_self:
+        other_args.append("--no-self")
+    if no_default:
+        other_args.append("--no-default")
     for group in args:
-        groups.extend(["--group", group])
-    session.run("pdm", "install", "--check", *groups, external=True)
+        other_args.extend(["--group", group])
+    session.run("pdm", "install", "--check", *other_args, external=True)
 
 
 @functools.lru_cache
@@ -123,17 +127,17 @@ def run_shellcheck(session, mode="check"):
     session.run(*shellcheck_cmd, external=True)
 
 
-@nox.session(name="format", python=PYTHON_DEFAULT_VERSION)
+@nox.session(name="format", python=PYTHON_DEFAULT_VERSION, tags=["format", "check"])
 def format_(session):
     """Lint the code and apply fixes in-place whenever possible."""
-    install(session, "lint")
+    install(session, "lint", no_self=True, no_default=True)
     session.run("ruff", "check", "--fix", ".")
     run_shellcheck(session, mode="fmt")
     run_readable(session, mode="fmt")
     session.run("ruff", "format", ".")
 
 
-@nox.session(python=PYTHON_DEFAULT_VERSION)
+@nox.session(python=PYTHON_DEFAULT_VERSION, tags=["lint", "check"])
 def lint(session):
     """Run linters in readonly mode."""
     install(session, "lint")
@@ -145,7 +149,7 @@ def lint(session):
     run_readable(session, mode="check")
 
 
-@nox.session(python=PYTHON_VERSIONS)
+@nox.session(python=PYTHON_VERSIONS, tags=["test", "check"])
 @nox.parametrize("django", DJANGO_VERSIONS)
 def test(session, django: str):
     session.run("pdm", "install", "--dev")
