@@ -1,6 +1,6 @@
 [project]
 name = "django-business-metrics"
-version = "1.0.1"
+version = "1.0.2"
 description = "Django Prometheus business metrics"
 license = {file = "LICENSE"}
 readme = "README.md"
@@ -13,6 +13,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 requires-python = ">=3.9"
 dependencies = [
@@ -20,16 +23,32 @@ dependencies = [
     "prometheus-client>=0.13.0",
 ]
 
+[project.urls]
+"Source" = "https://github.com/reef-technologies/django-business-metrics"
+"Issue Tracker" = "https://github.com/reef-technologies/django-business-metrics/issues"
+
 [tool.pdm]
 [tool.pdm.dev-dependencies]
-dev = [
-    "black>=22.6.0",
-    "django-stubs>=1.12.0",
+test = [
+    "freezegun",
     "mypy>=0.971",
-    "nox>=2023",
-    "pytest>=6",
+    "nox>=2024",
     "pytest-django",
-    "ruff>=0.0.272",
+    "pytest-xdist",
+    "pytest>=6",
+    "ruff>=0.4",
+]
+lint = [
+    "codespell[toml]",
+    "django-stubs[compatible-mypy]",
+    "mypy",
+    "ruff",
+    "types-freezegun",
+    "types-python-dateutil",
+    "types-requests",
+]
+release = [
+    "towncrier",
 ]
 
 [build-system]
@@ -40,16 +59,79 @@ build-backend = "pdm.backend"
 DJANGO_SETTINGS_MODULE="tests.settings"
 
 [tool.ruff]
-# TODO add D
-select = ["E", "F", "I", "UP"]
-# TODO: remove E501 once docstrings are formatted
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "D",
+    "E", "F", "I", "UP",
+    "TCH005",
+]
 ignore = [
     "D100", "D105", "D107", "D200", "D202", "D203", "D205", "D212", "D400", "D401", "D415",
-    "D101", "D102","D103", "D104", # TODO remove once we have docstring for all public methods
-    "E501", # TODO: remove E501 once docstrings are formatted
+    "D101", "D102", "D103", "D104", # TODO remove once we have docstring for all public methods
 ]
-line-length = 100
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"tests/**" = ["D", "F403", "F405"]
+"test/**" = ["D", "F403", "F405"]
+
+[tool.codespell]
+skip = "*.min.js,pdm.lock"
+ignore-words-list = "datas"
+
+[tool.towncrier]
+directory = "changelog.d"
+filename = "CHANGELOG.md"
+start_string = "<!-- towncrier release notes start -->\n"
+underlines = ["", "", ""]
+title_format = "## [{version}](https://github.com/reef-technologies/django-business-metrics/releases/tag/v{version}) - {project_date}"
+issue_format = "[#{issue}](https://github.com/reef-technologies/django-business-metrics/issues/{issue})"
+
+[[tool.towncrier.type]]
+directory = "removed"
+name = "Removed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "changed"
+name = "Changed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "fixed"
+name = "Fixed"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "deprecated"
+name = "Deprecated"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "added"
+name = "Added"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "doc"
+name = "Doc"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "infrastructure"
+name = "Infrastructure"
+showcontent = true
+
+[tool.bandit]
+include = ["django_business_metrics"]
+exclude_dirs = ["tests"]
+
+[tool.mypy]
+
+[[tool.mypy.overrides]]
+module = [
+    "nox",
+    "pytest",
+]
+ignore_missing_imports = true

@@ -1,6 +1,7 @@
 """
 Django settings used in tests.
 """
+
 DEBUG = True
 SECRET_KEY = "DUMMY"
 
@@ -17,4 +18,4 @@ DATABASES = {
 }
 
 ROOT_URLCONF = __name__
-urlpatterns = []
+urlpatterns = []  # type: ignore
