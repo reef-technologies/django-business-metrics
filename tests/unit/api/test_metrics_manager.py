@@ -1,16 +1,14 @@
 import pytest
 
-from django_business_metrics.v0 import BusinessMetricsManager, users
+
+@pytest.fixture
+def metrics_manager(apiver_module):
+    return apiver_module.BusinessMetricsManager()
 
 
 @pytest.fixture
-def metrics_manager():
-    return BusinessMetricsManager()
-
-
-@pytest.fixture
-def user_metric(metrics_manager):
-    return metrics_manager.add(users)
+def user_metric(apiver_module, metrics_manager):
+    return metrics_manager.add(apiver_module.users)
 
 
 @pytest.mark.django_db
