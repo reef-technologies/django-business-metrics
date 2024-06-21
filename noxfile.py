@@ -19,27 +19,30 @@ ROOT = Path(".")
 MAIN_BRANCH_NAME = "master"
 PYTHON_VERSIONS = ["3.9", "3.11", "3.12"]
 PYTHON_DEFAULT_VERSION = PYTHON_VERSIONS[-1]
-
 DJANGO_VERSIONS = ["3.2", "4.2"]
 DEMO_APP_DIR = ROOT / "demo"
 
 nox.options.default_venv_backend = "venv"
 nox.options.stop_on_first_error = True
-nox.options.reuse_existing_virtualenvs = True
+nox.options.reuse_existing_virtualenvs = not CI
 
 
-# In CI, use Python interpreter provided by GitHub Actions
 if CI:
+    # In CI, use Python interpreter provided by GitHub Actions
     PYTHON_VERSIONS = [sys.executable]
 
 
-def install(session: nox.Session, *args, no_self=False, no_default=False):
+def install(session: nox.Session, *groups, dev: bool = True, editable: bool = False, no_self=False, no_default=False):
     other_args = []
+    if not dev:
+        other_args.append("--prod")
+    if not editable:
+        other_args.append("--no-editable")
     if no_self:
         other_args.append("--no-self")
     if no_default:
         other_args.append("--no-default")
-    for group in args:
+    for group in groups:
         other_args.extend(["--group", group])
     session.run("pdm", "install", "--check", *other_args, external=True)
 
@@ -53,8 +56,7 @@ def _list_files() -> list[Path]:
     ):
         cmd_result = subprocess.run(cmd, check=True, text=True, capture_output=True)
         file_list.extend(cmd_result.stdout.splitlines())
-    file_paths = [Path(p) for p in file_list]
-    return file_paths
+    return [Path(p) for p in file_list]
 
 
 def list_files(suffix: str | None = None) -> list[Path]:
@@ -140,7 +142,8 @@ def format_(session):
 @nox.session(python=PYTHON_DEFAULT_VERSION, tags=["lint", "check"])
 def lint(session):
     """Run linters in readonly mode."""
-    install(session, "lint")
+    # "test" group is required for mypy to work against test files
+    install(session, "lint", "test")
     session.run("ruff", "check", "--diff", "--unsafe-fixes", ".")
     session.run("ruff", "format", "--diff", ".")
     session.run("mypy", ".")
@@ -152,7 +155,7 @@ def lint(session):
 @nox.session(python=PYTHON_VERSIONS, tags=["test", "check"])
 @nox.parametrize("django", DJANGO_VERSIONS)
 def test(session, django: str):
-    session.run("pdm", "install", "--dev")
+    install(session, "test")
     session.run("pip", "install", f"django~={django}.0")
     session.run("pytest", "-vv", "-n", "auto", *session.posargs)
 
@@ -162,7 +165,7 @@ def make_release(session):
     parser = argparse.ArgumentParser()
 
     def version(value):
-        if not re.match(r"\d+\.\d+\.\d+", value):
+        if not re.match(r"\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?", value):
             raise argparse.ArgumentTypeError("Invalid version format")
         return value
 

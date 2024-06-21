@@ -1,8 +1,10 @@
 [project]
 name = "django-business-metrics"
 version = "1.0.2"
+requires-python = ">=3.9"
 description = "Django Prometheus business metrics"
-license = {file = "LICENSE"}
+keywords = []
+license = {text = "MIT"}
 readme = "README.md"
 authors = [
     {name = "Reef Technologies", email = "opensource@reef.pl"},
@@ -17,7 +19,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-requires-python = ">=3.9"
 dependencies = [
     "Django>=3",
     "prometheus-client>=0.13.0",
@@ -27,21 +28,31 @@ dependencies = [
 "Source" = "https://github.com/reef-technologies/django-business-metrics"
 "Issue Tracker" = "https://github.com/reef-technologies/django-business-metrics/issues"
 
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]  # allow for `import tests` in test files
+target_package_name = "django_business_metrics"  # required by pytest-apiver
+DJANGO_SETTINGS_MODULE="tests.settings"
+
 [tool.pdm]
+distribution = true
+
 [tool.pdm.dev-dependencies]
 test = [
     "freezegun",
-    "mypy>=0.971",
-    "nox>=2024",
+    "pytest",
+    "pytest-apiver @ git+https://github.com/reef-technologies/pytest_apiver.git",
+    "pytest-asyncio",
     "pytest-django",
     "pytest-xdist",
-    "pytest>=6",
-    "ruff>=0.4",
 ]
 lint = [
     "codespell[toml]",
-    "django-stubs[compatible-mypy]",
-    "mypy",
+    "django-stubs>=1.12.0",
+    "mypy>=1.8",
     "ruff",
     "types-freezegun",
     "types-python-dateutil",
@@ -50,13 +61,6 @@ lint = [
 release = [
     "towncrier",
 ]
-
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-[tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE="tests.settings"
 
 [tool.ruff]
 line-length = 120
@@ -133,5 +137,6 @@ exclude_dirs = ["tests"]
 module = [
     "nox",
     "pytest",
+    "tests.*",
 ]
 ignore_missing_imports = true
