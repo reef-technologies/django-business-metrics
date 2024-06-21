@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/reef-technologies/cookiecutter-rt-pkg",
-  "commit": "7390ecadb2c65075b6c6c9216c894cc6c4533b3e",
+  "commit": "93b8dabfc11ca0f56b94e2e0023e9eca6a8a574f",
   "checkout": null,
   "context": {
     "cookiecutter": {

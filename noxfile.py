@@ -202,9 +202,9 @@ def make_release(session):
         message = f"release {tag}"
 
     session.log(
-        f'CHANGELOG updated, please review changes, and execute when ready:\n'
-        f'    git commit -m {message!r}\n'
-        f'    git push origin {current_branch}\n'
-        f'    git tag {tag}\n'
-        f'    git push origin {tag}\n'
+        f"CHANGELOG updated, please review changes, and execute when ready:\n"
+        f"    git commit -m {message!r}\n"
+        f"    git push origin {current_branch}\n"
+        f"    git tag {tag}\n"
+        f"    git push origin {tag}\n"
     )
