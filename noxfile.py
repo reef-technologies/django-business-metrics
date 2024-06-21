@@ -162,6 +162,7 @@ def test(session, django: str):
 
 @nox.session(python=PYTHON_DEFAULT_VERSION)
 def make_release(session):
+    install(session, "release", no_self=True, no_default=True)
     parser = argparse.ArgumentParser()
 
     def version(value):
@@ -174,14 +175,36 @@ def make_release(session):
         help="Release version in semver format (e.g. 1.2.3)",
         type=version,
     )
+    parser.add_argument(
+        "--draft",
+        action="store_true",
+        help="Create a draft release",
+    )
     parsed_args = parser.parse_args(session.posargs)
 
     local_changes = subprocess.check_output(["git", "diff", "--stat"])
     if local_changes:
         session.error("Uncommitted changes detected")
 
-    current_branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True)
+    current_branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True).strip()
     if current_branch != MAIN_BRANCH_NAME:
-        session.error(f"WARNING: releasing from a branch different than {MAIN_BRANCH_NAME!r}")
+        session.warn(f"Releasing from a branch {current_branch!r}, while main branch is {MAIN_BRANCH_NAME!r}")
+        if not parsed_args.draft:
+            session.error("Only draft releases are allowed from non-main branch")
 
     session.run("towncrier", "build", "--yes", "--version", parsed_args.release_version)
+
+    if parsed_args.draft:
+        tag = f"draft/v{parsed_args.release_version}"
+        message = f"Draft release {tag}"
+    else:
+        tag = f"v{parsed_args.release_version}"
+        message = f"release {tag}"
+
+    session.log(
+        f'CHANGELOG updated, please review changes, and execute when ready:\n'
+        f'    git commit -m {message!r}\n'
+        f'    git push origin {current_branch}\n'
+        f'    git tag {tag}\n'
+        f'    git push origin {tag}\n'
+    )
