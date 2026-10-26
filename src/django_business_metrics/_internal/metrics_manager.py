@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Callable
 
 import prometheus_client
+from django.db import connections
 from django.http import HttpRequest, HttpResponse
 from prometheus_client.metrics_core import GaugeMetricFamily
 from prometheus_client.registry import CollectorRegistry
@@ -30,10 +31,16 @@ class _BusinessMetricsCollector(CollectorRegistry):
 
     @staticmethod
     def _map_metric(metric: _BusinessMetric) -> GaugeMetricFamily:
+        # Runs in a pool thread. Django closes database connections only in the thread handling the request,
+        # so close the ones the metric opened here; otherwise every collection leaves them open.
+        try:
+            value = metric.callable()
+        finally:
+            connections.close_all()
         return GaugeMetricFamily(
             name=metric.name,
             documentation=metric.documentation,
-            value=metric.callable(),
+            value=value,
         )
 
     def add(self, metric: _BusinessMetric):

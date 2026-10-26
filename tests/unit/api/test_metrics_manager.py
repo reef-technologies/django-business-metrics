@@ -1,4 +1,6 @@
 import pytest
+from django.contrib.auth import get_user_model
+from django.db import connections
 
 
 @pytest.fixture
@@ -26,3 +28,18 @@ class TestBusinessMetricsManager:
         response = metrics_manager.view(request)
         assert response.status_code == 200
         assert response.content == b"# HELP users \n# TYPE users gauge\nusers 0.0\n"
+
+    def test_view_closes_db_connections_opened_by_metrics(self, request_factory, metrics_manager):
+        metric_connections = []
+
+        @metrics_manager.metric(name="users_count")
+        def users_count():
+            # metrics are collected in other threads, each with its own database connection
+            metric_connections.append(connections["default"])
+            return get_user_model().objects.count()
+
+        response = metrics_manager.view(request_factory.get("/business-metrics"))
+
+        assert response.status_code == 200
+        assert len(metric_connections) == 1
+        assert metric_connections[0].connection is None

@@ -1,0 +1,1 @@
+Database connections opened by metrics are now closed after each collection. Metrics are collected in pool threads, where Django never closes connections itself, so every scrape of the view used to leave them open until the database refused new ones.
