@@ -1,3 +1,7 @@
+## [1.0.1](https://github.com/reef-technologies/django-business-metrics/releases/tag/v1.0.1) - 2023-10-19
+
+Published to PyPI without changelog entries.
+
 ## [1.0.0](https://github.com/reef-technologies/django-business-metrics/releases/tag/v1.0.0) - 2023-10-13
 
 ### Changed
