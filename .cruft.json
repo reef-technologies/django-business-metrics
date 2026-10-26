@@ -7,7 +7,7 @@
       "package_name": "django_business_metrics",
       "repository_github_url": "https://github.com/reef-technologies/django-business-metrics",
       "python_versions": "3.12, 3.13, 3.14",
-      "django_versions": "5.2, 6.0",
+      "django_versions": "5.2, 6.0, 6.1",
       "build_docker_image": false,
       "_jinja2_env_vars": {
         "trim_blocks": true,
