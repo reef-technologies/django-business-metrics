@@ -1,4 +1,4 @@
-name: "Continuous Deployment"
+name: Continuous Deployment
 
 # This workflow requires https://docs.pypi.org/trusted-publishers/ to be enabled for the repository.
 # Follow instructions from this link to enable it.
@@ -8,86 +8,58 @@ name: "Continuous Deployment"
 on:
   push:
     tags:
-      - 'v*'  # push events to matching v*, i.e. v1.0, v20.15.10
-      - 'draft/v*'
+      - 'v*.*.*'
 
-env:
-  PYTHON_DEFAULT_VERSION: "3.12"
+# Default for jobs that declare no `permissions` of their own. A job-level block
+# REPLACES this one rather than extending it, so each job below must list every
+# scope it needs, including `contents: read` for the checkout.
+permissions:
+  contents: read
 
 jobs:
-  publish:
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-pypi:
     permissions:
       id-token: write  # allows publishing to PyPI
       contents: write  # allows uploading a GitHub release
     runs-on: ubuntu-latest
     steps:
-      - name: Get version from tag
-        id: get-version
-        run: |
-          if [[ ${{ github.ref }} == refs/tags/v* ]]; then
-              echo "draft=false" >> "$GITHUB_OUTPUT"
-              echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
-          else
-              echo "draft=true" >> "$GITHUB_OUTPUT"
-              echo "version=${GITHUB_REF#refs/tags/draft/v}" >> "$GITHUB_OUTPUT"
-          fi
-          export IS_PRERELEASE=$([[ ${{ github.ref }} =~ [^0-9]$ ]] && echo true || echo false)
-          echo "prerelease=$IS_PRERELEASE" >> $GITHUB_OUTPUT
-
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          ref: ${{ github.ref }}
 
-      - name: Set up Python ${{ env.PYTHON_DEFAULT_VERSION }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_DEFAULT_VERSION }}
+      - name: Detect release type
+        id: release-type
+        uses: ./.github/actions/detect-release-type
 
-      - name: Install dependencies
-        run: python -m pip install --upgrade nox 'pdm>=2.12,<3'
-
-      - name: Read the Changelog
-        id: read-changelog
-        uses: mindsers/changelog-reader-action@v2
-        with:
-          version: ${{ steps.get-version.outputs.version }}
-          path: ./CHANGELOG.md
-        continue-on-error: ${{ fromJSON(steps.get-version.outputs.draft) }}
+      - uses: ./.github/actions/setup-uv-nox
+        if: steps.release-type.outputs.type != 'unknown'
 
       - name: Build
-        run: pdm build
-
-      - name: Sign distribution
-        uses: sigstore/gh-action-sigstore-python@v2.1.1
-        with:
-          inputs: >-
-            dist/*.tar.gz
-            dist/*.whl
+        if: steps.release-type.outputs.type != 'unknown'
+        run: uv build
 
       - name: Create GitHub release
         id: create-release
-        uses: softprops/action-gh-release@v2
+        if: steps.release-type.outputs.type != 'unknown'
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda  # v3.0.0
         with:
-          name: ${{ steps.get-version.outputs.version }}
-          body: ${{ steps.read-changelog.outputs.changes }}
-          draft: ${{ fromJSON(steps.get-version.outputs.draft)}}
-          prerelease: ${{ fromJSON(steps.get-version.outputs.prerelease) }}
+          name: ${{ github.ref_name }}
+          body: Release ${{ github.ref_name }}
+          prerelease: ${{ steps.release-type.outputs.type == 'prerelease' }}
+          generate_release_notes: true
           files: >-
             dist/*.tar.gz
             dist/*.whl
-            dist/*.sigstore
-
-      - name: Remove signature files as pypa/gh-action-pypi-publish does not support them
-        run: rm -f dist/*.sigstore
 
       - name: Publish distribution 📦 to TestPyPI
-        if: ${{ steps.get-version.outputs.draft == 'true' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
+        if: steps.release-type.outputs.type == 'prerelease'
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
         with:
           repository-url: https://test.pypi.org/legacy/
 
       - name: Publish distribution 📦 to PyPI
-        if: ${{ steps.get-version.outputs.draft == 'false' }}
-        uses: pypa/gh-action-pypi-publish@release/v1
+        if: steps.release-type.outputs.type == 'release'
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
+

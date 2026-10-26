@@ -9,8 +9,9 @@ venv
 media/
 .backups/
 .envrc
-.pdm-python
+.python-version
 .terraform.lock.hcl
 .terraform/
 .nox/
 __pycache__
+src/django_business_metrics/_version.py

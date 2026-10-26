@@ -45,38 +45,57 @@ This Django app provides a Prometheus metrics endpoint serving so-called busines
 
 3. Setup your Prometheus agent to scrape metrics from `/business-metrics` endpoint.
 
+## Development
 
-## Versioning
+Pre-requisites:
+- [uv](https://docs.astral.sh/uv/)
+- [nox](https://nox.thea.codes/en/stable/) - may be installed as `uv tool install --with pyyaml --exclude-newer "14 days" nox`
+- [docker](https://www.docker.com/) and [docker compose plugin](https://docs.docker.com/compose/)
 
-This package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-TL;DR you are safe to use [compatible release version specifier](https://packaging.python.org/en/latest/specifications/version-specifiers/#compatible-release) `~=MAJOR.MINOR` in your `pyproject.toml` or `requirements.txt`.
+Ideally, you should run `nox -s format lint` before every commit to ensure that the code is properly formatted and linted.
+Before submitting a PR, make sure that tests pass as well, you can do so using:
+
+```sh
+nox -t check  # equivalent to `nox -s format lint test`
+```
+
+If you wish to install dependencies into `.venv` so your IDE can pick them up, you can do so using:
+
+```sh
+uv sync --all-extras --dev
+```
+
+### Python  / django  version compatibility
+
+Use cruft questionnaire to add/remove supported versions: `cruft update --cookiecutter-input`
+
+### Versioning
+
+This package uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html) and [Conventional Commits](https://www.conventionalcommits.org/).
+
+[Commitizen](https://commitizen-tools.github.io/commitizen/) may be used to generate commit messages:
+
+```sh
+uv tool install "commitizen==4.13.9"
+git add ...
+cz commit
+```
 
 Additionally, this package uses [ApiVer](https://www.youtube.com/watch?v=FgcoAKchPjk) to further reduce the risk of breaking changes.
 This means, the public API of this package is explicitly versioned, e.g. `django_business_metrics.v1`, and will not change in a backwards-incompatible way even when `django_business_metrics.v2` is released.
 
 Internal packages, i.e. prefixed by `django_business_metrics._` do not share these guarantees and may change in a backwards-incompatible way at any time even in patch releases.
 
-
-## Development
-
-
-Pre-requisites:
-- [pdm](https://pdm.fming.dev/)
-- [nox](https://nox.thea.codes/en/stable/)
-- [docker](https://www.docker.com/) and [docker compose plugin](https://docs.docker.com/compose/)
-
-
-Ideally, you should run `nox -t format lint` before every commit to ensure that the code is properly formatted and linted.
-Before submitting a PR, make sure that tests pass as well, you can do so using:
-```
-nox -t check # equivalent to `nox -t format lint test`
-```
-
-If you wish to install dependencies into `.venv` so your IDE can pick them up, you can do so using:
-```
-pdm install --dev
-```
-
 ### Release process
 
-Run `nox -s make_release -- X.Y.Z` where `X.Y.Z` is the version you're releasing and follow the printed instructions.
+Releases are prepared explicitly *by developers* with help of Commitizen. Run `cz bump` which will:
+- update the changelog
+- make the bump commit and tag it
+
+Then push the commit & tag to the repository, which will trigger the release workflow:
+```sh
+git push origin HEAD --follow-tags
+```
+
+- `alpha`, `beta` and `rc` releases are published to TestPyPI (use `cz bump --prerelease alpha|beta|rc` to create them)
+- regular ones are published to PyPI

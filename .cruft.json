@@ -1,17 +1,23 @@
 {
   "template": "https://github.com/reef-technologies/cookiecutter-rt-pkg",
-  "commit": "93b8dabfc11ca0f56b94e2e0023e9eca6a8a574f",
+  "commit": "e0bf78b77b7708a949ae4dd4b347fbdaa5c7fcc8",
   "checkout": null,
   "context": {
     "cookiecutter": {
       "package_name": "django_business_metrics",
       "repository_github_url": "https://github.com/reef-technologies/django-business-metrics",
-      "is_django_package": "y",
+      "python_versions": "3.12, 3.13, 3.14",
+      "django_versions": "5.2, 6.0",
+      "build_docker_image": false,
       "_jinja2_env_vars": {
-        "block_start_string": "# COOKIECUTTER{%",
-        "block_end_string": "%}"
+        "trim_blocks": true,
+        "lstrip_blocks": true
       },
-      "_template": "https://github.com/reef-technologies/cookiecutter-rt-pkg"
+      "_extensions": [
+        "local_extensions.sort_versions"
+      ],
+      "_template": "https://github.com/reef-technologies/cookiecutter-rt-pkg",
+      "_commit": "e0bf78b77b7708a949ae4dd4b347fbdaa5c7fcc8"
     }
   },
   "directory": null

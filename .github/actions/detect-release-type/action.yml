@@ -1,0 +1,20 @@
+
+name: Detect release type
+description: Detects release type from tag name
+outputs:
+  type:
+    description: release type
+    value: ${{ steps.detect.outputs.type }}
+runs:
+  using: composite
+  steps:
+    - id: detect
+      shell: bash
+      run: |
+        if [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(a|b|rc)[0-9]+$ ]]; then
+          echo "type=prerelease" >> "$GITHUB_OUTPUT"
+        elif [[ "${GITHUB_REF_NAME}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "type=release" >> "$GITHUB_OUTPUT"
+        else
+          echo "type=unknown" >> "$GITHUB_OUTPUT"
+        fi
